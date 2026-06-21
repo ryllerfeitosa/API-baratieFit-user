@@ -1,0 +1,93 @@
+/********************************************************************************************************************************************************************************************
+ * Objetivo: Arquivo responsável pelo CRUD no Banco de dados MySQL na tabela de intermediário de refeição e alimento.
+ * Data: 17/06/2026
+ * Autor: Lucas Dias Brandão Kolle
+ * Versão: 1.0.06.26
+ ********************************************************************************************************************************************************************************************/
+
+//importando a biblioteca para gerenciar o banco de dados no node.js
+const knex = require("knex")
+
+//importando o arquivo "database_config_knex" para atribuir as configurações do BD
+const knexConfig = require("../../database_config_knex/knexFile.js")
+
+//criando a conexão por meio do arquivo que contém os dados necessários para estabelecer o acesso e a conexão
+const knexConex = knex(knexConfig.development) //aciona o knex e passa as configurações estabelecidas no arquivo
+
+/* INICIANDO CRUD DA TABELA INTEMDIÁRIA DE REFEIÇÃO E ALIMENTO */
+
+//retornar todos os dados
+const selectAllRefeicaoAlimento = async function(){
+
+    try {
+        
+        //criando variável sql
+        let sql = ` select 	tbl_refeicao_alimento.id_refeicao,
+                        tbl_refeicao_alimento.id_alimento,
+                        tbl_refeicao_alimento.quantidade_g,
+                        tbl_refeicao.nome as nome_refeicao,
+                        tbl_refeicao.descricao,
+                        tbl_refeicao.modo_preparo,
+                        tbl_refeicao.img,
+                        tbl_alimento.nome as nome_alimento,
+                        tbl_alimento.proteinas_g,
+                        tbl_alimento.carboidratos_g,
+                        tbl_alimento.lipidios_g
+
+                    from 	tbl_refeicao
+                        inner join tbl_refeicao_alimento
+                            on tbl_refeicao.id = tbl_refeicao_alimento.id_refeicao
+                        inner join tbl_alimento
+                            on tbl_alimento.id	= tbl_refeicao_alimento.id_alimento
+                        order by tbl_refeicao.nome asc;`
+
+        //enviando para o banco de dados
+        let result = await knexConex.raw(sql)
+
+        //Verificando se é um array
+        if(Array.isArray(result)){
+
+            return result[0]
+        }else{
+            return false
+        }
+    } catch (error) {
+        return false
+    }
+}
+
+//retorna um dado específico
+const selectByIdRefeicaoAlimento = async function(id){
+
+    try {
+        
+        let sql = `select * from tbl_refeicao_alimento where id = ${id}`
+
+        let result = await knexConex.raw(sql)
+
+        if(Array.isArray(result)){
+            return result[0]
+        }else{
+            return false
+        }
+    } catch (error) {
+        return false
+    }
+}
+
+//Retorna as refeições filtradas pelo id do alimento
+const selectRefeicaoByIdAlimento = function(idAlimento){
+
+}
+
+//Retorna as refeições filtradas pelo id da refeição
+const selectAlimentoByIdRefeicao = function(idRefeicao){
+
+}
+
+
+//Exportando funções para serem utilizadas na controller
+module.exports = {
+    selectAllRefeicaoAlimento,
+    selectByIdRefeicaoAlimento
+}
